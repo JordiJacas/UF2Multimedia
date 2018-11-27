@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +32,7 @@ import static com.example.tnb_20.uf2multimedia.R.id.imageView2;
 public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    ImageView iv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        iv = findViewById(R.id.imageView2);
+        File file = new File("/data/data/com.example.tnb_20.uf2multimedia/files/image.jpg");
+        Uri uir = Uri.fromFile(file);
+        iv.setImageURI(uir);
     }
 
     @Override
@@ -65,8 +72,19 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            ImageView iv = findViewById(R.id.imageView2);
+            iv = findViewById(R.id.imageView2);
             iv.setImageBitmap(imageBitmap);
+
+            // guardar a disc
+            try {
+                FileOutputStream out = openFileOutput("image.jpg", MODE_PRIVATE);
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                out.close();
+                Log.v("TAG OK", "Arxiu ok");
+            } catch (Exception e) {
+                Log.v("FILE ERROR", "Error escrivint arxiu");
+                e.printStackTrace();
+            }
         }
     }
 
